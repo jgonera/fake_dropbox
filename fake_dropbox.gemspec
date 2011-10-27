@@ -20,8 +20,9 @@ Gem::Specification.new do |s|
   
   s.add_dependency 'sinatra', '~> 1.2.6'
   s.add_dependency 'json', '~> 1.5.3'
+  s.add_dependency 'rack', '~> 1.3.2'
   s.add_dependency 'rack-test', '~> 0.6.1'
   s.add_dependency 'webmock', '~> 1.6.4'
   
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec', '~> 2.6.0'
 end
