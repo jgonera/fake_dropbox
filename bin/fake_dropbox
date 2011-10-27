@@ -3,7 +3,7 @@ $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), '../lib'))
 
 if not ENV.include? 'DROPBOX_DIR'
   puts "You have to specify the DROPBOX_DIR in ENV, e.g."
-  puts "DROPBOX_DIR=/home/joe/fake_dropbox"
+  puts "DROPBOX_DIR=/home/joe/somedir"
   exit
 end
 
