@@ -1,7 +1,4 @@
 source 'http://rubygems.org'
 
-gem 'sinatra'
-gem 'json'
-gem 'rack-test'
-gem 'rspec'
-gem 'webmock'
+gemspec
+
