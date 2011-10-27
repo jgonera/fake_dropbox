@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.description = %q{Written in Ruby using the Sinatra framework. For development and testing purposes, no real authentication and users, stores files on the local machine. Can be used either as a standalone app listening on a port or intercept calls to the real Dropbox in Ruby apps.}
 
   s.rubyforge_project = "fake_dropbox"
+  s.extra_rdoc_files  = ['README.md', 'LICENSE']
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
@@ -19,10 +20,10 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   
   s.add_dependency 'sinatra', '~> 1.2.6'
-  s.add_dependency 'json', '~> 1.5.3'
+  s.add_dependency 'json', '~> 1.6.1'
   s.add_dependency 'rack', '~> 1.3.2'
   s.add_dependency 'rack-test', '~> 0.6.1'
-  s.add_dependency 'webmock', '~> 1.6.4'
+  s.add_dependency 'webmock', '~> 1.7.7'
   
-  s.add_development_dependency 'rspec', '~> 2.6.0'
+  s.add_development_dependency 'rspec', '~> 2.7.0'
 end
