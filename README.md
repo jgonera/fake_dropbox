@@ -1,4 +1,5 @@
-# fake_dropbox
+fake_dropbox
+============
 
 fake_dropbox is a simple fake implementation of the Dropbox API written in Ruby
 using the Sinatra framework. It can be used for developing and testing
@@ -12,7 +13,9 @@ It partially implements [version 0](https://www.dropbox.com/developers/reference
 of the Dropbox API which should be compatible with [version 1](https://www.dropbox.com/developers/reference/api).
 If you find it useful and want to add support for more features, go ahead ;)
 
-## Installation
+
+Installation
+------------
 
 Using RubyGems:
 
@@ -29,7 +32,9 @@ Then, if you want to install it as a gem:
 
     rake install
 
-## How to use
+
+How to use
+----------
 
 ### Running the server
 
@@ -61,6 +66,7 @@ If you don't provide it, a temporary directory will be created in the system's
 temporary path.
 
 Moreover:
+
 * `#dropbox_dir` returns the fake Dropbox directory.
 * `#empty!` deletes everything in the `dropbox_dir` *recursively*.
 Even though it should work only if the `dropbox_dir` resides inside the system's
@@ -82,3 +88,11 @@ If you cloned the repository and you don't want to install fake_dropbox as a
 gem, you can run it using `rackup` while in the fake_dropbox directory:
 
     DROPBOX_DIR=/home/joe/somedir rackup
+
+
+Copyright
+---------
+
+Copyright © 2011 Juliusz Gonera
+fake_dropbox is released under the MIT license.
+
