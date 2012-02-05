@@ -93,5 +93,6 @@ gem, you can run it using `rackup` while in the fake_dropbox directory:
 Copyright
 ---------
 
-Copyright © 2011 Juliusz Gonera. fake_dropbox is released under the MIT license, see LICENSE for details.
+Copyright © 2011 Juliusz Gonera. fake_dropbox is released under the MIT license,
+see LICENSE for details.
 
