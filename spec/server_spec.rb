@@ -158,7 +158,7 @@ describe 'FakeDropbox::Server' do
   describe "GET /<version>/metadata/dropbox/<path>" do
     it "returns metadata" do
       File.open(File.join(@tmpdir, 'file.ext'), 'w')
-      get "/0/metadata/dropbox/file.ext", {}, @env
+      get "/0/metadata/dropbox/file.ext", { list: 'false' }, @env
       last_response.should be_ok
       metadata = JSON.parse(last_response.body)
       metadata['path'].should == '/file.ext'
@@ -168,7 +168,7 @@ describe 'FakeDropbox::Server' do
     context "when the path is a directory and want a list" do
       it "returns its children metadata too" do
         FileUtils.cp(fixture_path('dummy.txt'), @tmpdir)
-        get "/0/metadata/dropbox", {list: 'true'}, @env
+        get "/0/metadata/dropbox", {}, @env
         metadata = JSON.parse(last_response.body)
         metadata.should include 'contents'
       end

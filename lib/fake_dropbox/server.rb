@@ -71,8 +71,9 @@ module FakeDropbox
     end
     
     get '/:version/metadata/:mode*' do
+      list = params['list'] == 'false' ? false : true
       content_type :json
-      metadata(params[:splat][0], params['list'] == 'true').to_json
+      metadata(params[:splat][0], list).to_json
     end
     
     post '/:version/fileops/create_folder' do
