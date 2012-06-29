@@ -40,8 +40,14 @@ module FakeDropbox
       FileUtils.cp(tempfile.path, File.join(@dropbox_dir, file_path))
       File.delete(tempfile.path) if File.exists? tempfile.path
       
+      result = if params[:version] == '0'
+        { 'result' => 'winner!' }
+      else
+        metadata(file_path)
+      end
+
       content_type :json
-      { 'result' => 'winner!' }.to_json
+      result.to_json
     end
     
     get '/:version/files/:mode*' do
