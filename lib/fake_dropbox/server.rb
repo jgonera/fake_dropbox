@@ -23,11 +23,11 @@ module FakeDropbox
     end
     
     post '/:version/oauth/request_token' do
-      'oauth_token_secret=request_token&oauth_token=request_secret'
+      'oauth_token_secret=request_secret&oauth_token=request_token'
     end
     
     post '/:version/oauth/access_token' do
-      'oauth_token_secret=access_token&oauth_token=access_secret'
+      'oauth_token_secret=access_secret&oauth_token=access_token'
     end
 
     post '/:version/files/:mode*' do
