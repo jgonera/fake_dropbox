@@ -31,7 +31,7 @@ describe 'FakeDropbox::Server' do
     let(:uploaded_file) { Rack::Test::UploadedFile.new(fixture_path('dummy.txt')) }
     let(:params) { { file: uploaded_file } }
     
-    shared_examples_for "correct upload" do
+    shared_examples_for "correct POST upload" do
       it "saves the file in the directory" do
         post "/0/files/dropbox" + path, params, @env
         Dir.entries(dir).should include 'dummy.txt'
@@ -66,7 +66,7 @@ describe 'FakeDropbox::Server' do
       let (:path) { '' }
       let (:dir) { @tmpdir }
       
-      it_behaves_like "correct upload"
+      it_behaves_like "correct POST upload"
     end
     
     context "when the path is not root" do
@@ -75,12 +75,57 @@ describe 'FakeDropbox::Server' do
         let (:dir) { File.join(@tmpdir, path) }
         before { Dir.mkdir(dir) }
         
-        it_behaves_like "correct upload"
+        it_behaves_like "correct POST upload"
       end
       
       context "when the path does not exist" do
         it "returns error 404" do
           post "/0/files/dropbox/incorrect", params, @env
+          last_response.status.should == 404
+        end
+      end
+    end
+  end
+
+  describe "PUT /<version>/files_put/dropbox/<path>" do
+    let(:body) { IO.read(fixture_path('dummy.txt')) }
+    
+    shared_examples_for "correct PUT upload" do
+      it "saves the file in the directory" do
+        put "/1/files_put/dropbox" + path, body, @env
+        Dir.entries(dir).should include 'dummy.txt'
+        uploaded_content = IO.read(File.join(dir, 'dummy.txt'))
+        uploaded_content.should == body
+      end
+
+      it "returns file metadata" do
+        put "/1/files_put/dropbox" + path, body, @env
+        last_response.should be_ok
+        metadata = JSON.parse(last_response.body)
+        metadata['path'].should == path
+        metadata['modified'].should include Time.new.strftime('%a, %d %b %Y %H:%M')
+      end
+    end
+    
+    context "when the path is root" do
+      let (:path) { '/dummy.txt' }
+      let (:dir) { @tmpdir }
+      
+      it_behaves_like "correct PUT upload"
+    end
+    
+    context "when the path is not root" do
+      context "when the path exists" do
+        let (:path) { '/somedir/dummy.txt' }
+        let (:dir) { File.join(@tmpdir, '/somedir') }
+        before { Dir.mkdir(dir) }
+        
+        it_behaves_like "correct PUT upload"
+      end
+      
+      context "when the path does not exist" do
+        it "returns error 404" do
+          put "/1/files_put/dropbox/incorrect/dummy.txt", body, @env
           last_response.status.should == 404
         end
       end

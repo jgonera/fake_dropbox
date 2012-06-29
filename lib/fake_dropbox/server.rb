@@ -56,6 +56,19 @@ module FakeDropbox
       
       IO.read(file_path)
     end
+
+    put '/:version/files_put/:mode*' do
+      file_path = File.join(params[:splat])
+      dir = File.join(@dropbox_dir, File.dirname(file_path))
+      return status 404 unless File.exists?(dir) and File.directory?(dir)
+
+      File.open(File.join(@dropbox_dir, file_path), 'w+') do |file|
+        file.write(request.body.read)
+      end
+
+      content_type :json
+      metadata(file_path).to_json
+    end
     
     get '/:version/metadata/:mode*' do
       content_type :json
