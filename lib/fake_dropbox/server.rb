@@ -41,7 +41,7 @@ module FakeDropbox
       File.delete(tempfile.path) if File.exists? tempfile.path
       
       content_type :json
-      metadata(file_path).to_json
+      { 'result' => 'winner!' }.to_json
     end
     
     get '/:version/files/:mode*' do

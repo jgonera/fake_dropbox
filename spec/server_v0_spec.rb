@@ -46,12 +46,11 @@ describe 'FakeDropbox::Server' do
         File.exists?(tempfile.path).should == false
       end
       
-      it "returns file metadata" do
+      it "returns success message" do
         post "/0/files/dropbox" + path, params, @env
         last_response.should be_ok
-        metadata = JSON.parse(last_response.body)
-        metadata['path'].should == path + '/dummy.txt'
-        metadata['modified'].should include Time.new.strftime('%a, %d %b %Y %H:%M')
+        response = JSON.parse(last_response.body)
+        response.should == { 'result' => 'winner!' }
       end
     end
     
