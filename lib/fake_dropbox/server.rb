@@ -97,7 +97,12 @@ module FakeDropbox
       
       return status 404 unless File.exists?(entry_path)
       
+      metadata = metadata(entry)
       FileUtils.remove_entry_secure entry_path
+      if params[:version] == '1'
+        content_type :json
+        metadata.to_json
+      end
     end
   end
 end

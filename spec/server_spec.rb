@@ -246,6 +246,17 @@ describe 'FakeDropbox::Server' do
           last_response.should be_ok
           File.exists?(abs_path).should == false
         end
+
+        it "returns entry's metadata for version 0" do
+          post '/0/fileops/delete', params, @env
+          last_response.body.should be_empty
+        end
+
+        it "returns entry's metadata for version 1" do
+          post '/1/fileops/delete', params, @env
+          metadata = JSON.parse(last_response.body)
+          metadata['path'].should == params[:path]
+        end
       end
       
       context "when it's a non-empty directory" do
