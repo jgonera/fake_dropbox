@@ -7,7 +7,7 @@ module FakeDropbox
   class Server < Sinatra::Base
     before do
       if not request.path.start_with?('/__sinatra__')
-        @dropbox_dir = env['DROPBOX_DIR'] || ENV['DROPBOX_DIR']
+        @dropbox_dir = ENV['DROPBOX_DIR']
         raise 'no DROPBOX_DIR in ENV' if not @dropbox_dir
       end
     end
