@@ -17,6 +17,12 @@ describe 'FakeDropbox::Server' do
       last_response.should be_ok
       last_response.body.should include 'oauth_token=', 'oauth_token_secret='
     end
+
+    it "returns error 401 when not authorized" do
+      post "/__config__", { authorize_request_token: false }
+      post "/0/oauth/request_token"
+      last_response.status.should == 401
+    end
   end
   
   describe "POST /<version>/oauth/access_token" do
@@ -24,6 +30,12 @@ describe 'FakeDropbox::Server' do
       post "/0/oauth/access_token", {}
       last_response.should be_ok
       last_response.body.should include 'oauth_token=', 'oauth_token_secret='
+    end
+
+    it "returns error 401 when not authorized" do
+      post "/__config__", { authorize_access_token: false }
+      post "/0/oauth/access_token"
+      last_response.status.should == 401
     end
   end
   

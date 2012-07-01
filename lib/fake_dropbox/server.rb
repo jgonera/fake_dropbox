@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'json'
 require 'fileutils'
 require 'fake_dropbox/utils'
+require 'fake_dropbox/config'
 
 module FakeDropbox
   class Server < Sinatra::Base
@@ -21,12 +22,21 @@ module FakeDropbox
         "Unknown URI: #{request.request_method} #{request.path}"
       end
     end
+
+    post '/__config__' do
+      params.each do |key, value|
+        setter = "#{key}="
+        FakeDropbox::Config.send(setter, to_bool(value)) if FakeDropbox::Config.respond_to? setter
+      end
+    end
     
     post '/:version/oauth/request_token' do
+      return status 401 unless FakeDropbox::Config.authorize_request_token
       'oauth_token_secret=request_secret&oauth_token=request_token'
     end
     
     post '/:version/oauth/access_token' do
+      return status 401 unless FakeDropbox::Config.authorize_access_token
       'oauth_token_secret=access_secret&oauth_token=access_token'
     end
 
