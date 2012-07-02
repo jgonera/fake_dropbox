@@ -12,7 +12,7 @@ describe 'FakeDropbox::Server' do
   
   describe "POST /<version>/oauth/request_token" do
     it "returns a fake OAuth request token" do
-      post "/0/oauth/request_token", {}
+      post "/0/oauth/request_token"
       #File.open('/home/julas/Desktop/aaa.html', 'w') {|f| f.write(last_response.body) }
       last_response.should be_ok
       last_response.body.should include 'oauth_token=', 'oauth_token_secret='
@@ -27,7 +27,7 @@ describe 'FakeDropbox::Server' do
   
   describe "POST /<version>/oauth/access_token" do
     it "returns a fake OAuth access token" do
-      post "/0/oauth/access_token", {}
+      post "/0/oauth/access_token"
       last_response.should be_ok
       last_response.body.should include 'oauth_token=', 'oauth_token_secret='
     end
@@ -153,7 +153,7 @@ describe 'FakeDropbox::Server' do
       end
     
       it "returns file contents" do
-        get "/0/files/dropbox/file.ext", {}
+        get "/0/files/dropbox/file.ext"
         last_response.should be_ok
         last_response.body.should == "This is a test."
       end
@@ -161,7 +161,7 @@ describe 'FakeDropbox::Server' do
     
     context "when the file does not exist" do
       it "returns error 404" do
-        get "/0/files/dropbox/none.ext", {}
+        get "/0/files/dropbox/none.ext"
         last_response.status.should == 404
       end
     end
@@ -180,7 +180,7 @@ describe 'FakeDropbox::Server' do
     context "when the path is a directory and want a list" do
       it "returns its children metadata too" do
         FileUtils.cp(fixture_path('dummy.txt'), @tmpdir)
-        get "/0/metadata/dropbox", {}
+        get "/0/metadata/dropbox"
         metadata = JSON.parse(last_response.body)
         metadata.should include 'contents'
       end
