@@ -4,10 +4,17 @@ describe 'FakeDropbox::Server' do
   before :each do
     @tmpdir = Dir.mktmpdir 'fake_dropbox-test'
     ENV['DROPBOX_DIR'] = @tmpdir
+    FakeDropbox::Config.reset!
   end
   
   after :each do
     FileUtils.remove_entry_secure @tmpdir
+  end
+
+  it "returns error 401 for any API request if not authorized" do
+    post "/__config__", { authorized: false }
+    get "/0/files/dropbox/file.ext"
+    last_response.status.should == 401
   end
   
   describe "POST /<version>/oauth/request_token" do

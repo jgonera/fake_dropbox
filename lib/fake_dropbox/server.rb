@@ -7,7 +7,8 @@ require 'fake_dropbox/config'
 module FakeDropbox
   class Server < Sinatra::Base
     before do
-      if not request.path.start_with?('/__sinatra__')
+      if not request.path.start_with?('/__') # __sinatra__ and __config__
+        halt 401 unless FakeDropbox::Config.authorized
         @dropbox_dir = ENV['DROPBOX_DIR']
         raise 'no DROPBOX_DIR in ENV' if not @dropbox_dir
       end
