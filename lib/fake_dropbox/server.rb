@@ -11,6 +11,11 @@ module FakeDropbox
         halt 401 unless FakeDropbox::Config.authorized
         @dropbox_dir = ENV['DROPBOX_DIR']
         raise 'no DROPBOX_DIR in ENV' if not @dropbox_dir
+        if FakeDropbox::Config.debug
+          puts "#{request.request_method} #{request.path}"
+          puts request.body.read
+          request.body.rewind
+        end
       end
     end
     

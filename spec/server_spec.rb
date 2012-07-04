@@ -16,6 +16,15 @@ describe 'FakeDropbox::Server' do
     get "/0/files/dropbox/file.ext"
     last_response.status.should == 401
   end
+
+  it "outputs debug to STDIO when debug set to true" do
+    post "/__config__", { debug: true }
+    original_stdout = $stdout
+    $stdout = StringIO.new
+    put "/1/files_put/dropbox/file", "test body"
+    $stdout.string.should == "PUT /1/files_put/dropbox/file\ntest body\n"
+    $stdout = original_stdout
+  end
   
   describe "POST /<version>/oauth/request_token" do
     it "returns a fake OAuth request token" do
