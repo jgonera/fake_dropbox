@@ -13,6 +13,9 @@ module FakeDropbox
         raise 'no DROPBOX_DIR in ENV' if not @dropbox_dir
         if FakeDropbox::Config.debug
           puts "#{request.request_method} #{request.path}"
+          request.env.select { |k, v| k.start_with? 'HTTP_' }.each do |k, v|
+            puts "#{k}: #{v}"
+          end
           puts request.body.read
           request.body.rewind
         end

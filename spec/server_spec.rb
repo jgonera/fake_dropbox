@@ -22,7 +22,7 @@ describe 'FakeDropbox::Server' do
     original_stdout = $stdout
     $stdout = StringIO.new
     put "/1/files_put/dropbox/file", "test body"
-    $stdout.string.should == "PUT /1/files_put/dropbox/file\ntest body\n"
+    $stdout.string.should =~ /^PUT \/1\/files_put\/dropbox\/file\nHTTP.*\ntest body\n$/m
     $stdout = original_stdout
   end
   
