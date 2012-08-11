@@ -29,7 +29,6 @@ describe 'FakeDropbox::Server' do
   describe "POST /<version>/oauth/request_token" do
     it "returns a fake OAuth request token" do
       post "/0/oauth/request_token"
-      #File.open('/home/julas/Desktop/aaa.html', 'w') {|f| f.write(last_response.body) }
       last_response.should be_ok
       last_response.body.should include 'oauth_token=', 'oauth_token_secret='
     end

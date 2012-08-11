@@ -19,18 +19,24 @@ Installation
 
 Using RubyGems:
 
-    gem install fake_dropbox
+```
+gem install fake_dropbox
+```
 
 To get the latest development version just clone the repository:
 
-    git clone git://github.com/jgonera/fake_dropbox.git
-    cd fake_dropbox
-    gem install bundler
-    bundle install
+```
+git clone git://github.com/jgonera/fake_dropbox.git
+cd fake_dropbox
+gem install bundler
+bundle install
+```
 
 Then, if you want to install it as a gem:
 
-    rake install
+```
+rake install
+```
 
 
 How to use
@@ -40,11 +46,20 @@ How to use
 
 If you installed fake_dropbox as a gem, you should be able to run:
 
-    DROPBOX_DIR=/home/joe/somedir fake_dropbox [PORT]
+```
+DROPBOX_DIR=/home/joe/somedir fake_dropbox [PORT]
+```
 
 You have to specify an environment variable `DROPBOX_DIR` which will point the
 server to the directory on which the fake API should operate. Additionally, you
 can specify a custom port (default is 4321).
+
+If you cloned the repository and you don't want to install fake_dropbox as a
+gem, you can run it using `rackup` while in the fake_dropbox directory:
+
+```
+DROPBOX_DIR=/home/joe/somedir rackup
+```
 
 ### Intercepting requests in Ruby apps
 
@@ -55,7 +70,9 @@ is achieved by using the [WebMock](https://github.com/bblimke/webmock) library.
 The class responsible for this is `FakeDropbox::Glue`. To intercept requests to
 the real Dropbox, just instantiate this class in your code:
 
-    fake_dropbox = FakeDropbox::Glue.new
+```ruby
+fake_dropbox = FakeDropbox::Glue.new
+```
 
 You can provide an optional argument to the constructor, pointing to the
 directory you want to use for your fake Dropbox:
@@ -69,25 +86,38 @@ Moreover:
 
 * `#dropbox_dir` returns the fake Dropbox directory.
 * `#empty!` deletes everything in the `dropbox_dir` *recursively*.
-Even though it should work only if the `dropbox_dir` resides inside the system's
-temporary path, you should use it with caution.
+  Even though it should work only if the `dropbox_dir` resides inside the
+  system's temporary path, you should use it with caution.
 
 A support file for Cucumber tests could look like this:
 
-    require 'fake_dropbox'
+```ruby
+require 'fake_dropbox'
 
-    fake_dropbox = FakeDropbox::Glue.new
+fake_dropbox = FakeDropbox::Glue.new
 
-    After do
-      fake_dropbox.empty!
-    end
+After do
+fake_dropbox.empty!
+end
+```
 
-### Using without installing as a gem
+### Configuration
 
-If you cloned the repository and you don't want to install fake_dropbox as a
-gem, you can run it using `rackup` while in the fake_dropbox directory:
+fake_dropbox supports a few configuration options that can be changed after
+initialization. They can be changed in two ways:
 
-    DROPBOX_DIR=/home/joe/somedir rackup
+* by setting `FakeDropbox::Config.<option>` when using inside a Ruby app,
+* by sending a `POST` request to `/__config__` containing options and their
+  values as parameters (use `true` and `false` strings as boolean equivalents).
+
+The following options are available:
+
+* `authorize_request_token`, default: `true`
+* `authorize_access_token`, default: `true`
+* `authorized`, default: `true`, when set to `false` all API requests return
+  `401 Unauthorized` HTTP status
+* `debug`, default: `DROPBOX_DEBUG` environmental variable or `false`, if set
+  to `true` reports all the API requests to STDIO (URL, HTTP headers and body).
 
 
 Copyright
