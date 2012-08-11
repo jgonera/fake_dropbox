@@ -8,8 +8,13 @@ Gem::Specification.new do |s|
   s.authors     = ["Juliusz Gonera"]
   s.email       = ["jgonera@gmail.com"]
   s.homepage    = "https://github.com/jgonera/fake_dropbox"
-  s.summary     = %q{A simple fake implementation of the Dropbox API}
-  s.description = %q{Fake Dropbox API server written using the Sinatra framework. For development and testing purposes, no real authentication and users, stores files on the local machine. Can be used either as a standalone app listening on a port or intercept calls to the real Dropbox in Ruby apps.}
+  s.summary     = %q{Mock Dropbox when developing your Dropbox app}
+  s.description = %q{
+    Fake Dropbox server written using the Sinatra framework. For development
+    and testing purposes, no real authentication and users, stores files on the
+    local machine. Can be used either as a standalone app listening on a port
+    (language agnostic) or intercept calls to the real Dropbox in Ruby apps.
+  }
 
   s.rubyforge_project = "fake_dropbox"
   s.extra_rdoc_files  = ['README.md', 'LICENSE']
