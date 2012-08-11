@@ -2,16 +2,32 @@ fake_dropbox
 ============
 
 fake_dropbox is a simple fake implementation of the Dropbox API written in Ruby
-using the Sinatra framework. It can be used for developing and testing
-applications that use Dropbox. There are no real authentication and users (you
-are always authenticated), the server stores files on the local machine.
+using the Sinatra framework. It can be used to mock Dropbox when developing and
+testing applications that use Dropbox. There are no real authentication and
+users (you are always authenticated), files are stored on the local machine.
 
 Can be used either as a standalone app listening on a port or intercept calls to
 the real Dropbox in Ruby apps.
 
-It partially implements [version 0](https://www.dropbox.com/developers/reference/oldapi)
-of the Dropbox API which should be compatible with [version 1](https://www.dropbox.com/developers/reference/api).
+It implements the following API calls from [Dropbox API version 1][] (some may
+be only partially implemented):
+
+* /files (GET)
+* /files_put
+* /files (POST)
+* /metadata
+* /fileops/create_folder
+* /fileops/delete
+
+All the calls which are also present in [Dropbox API version 0][] should behave
+as they behave in the official Dropbox API when version is set to 0 (e.g.
+/files (POST) returns `{"result": "winner!"}` instead of file's metadata in
+version 0).
+
 If you find it useful and want to add support for more features, go ahead ;)
+
+[Dropbox API version 0]: https://www.dropbox.com/developers/reference/oldapi
+[Dropbox API version 1]: https://www.dropbox.com/developers/reference/api
 
 
 Installation
@@ -77,7 +93,9 @@ fake_dropbox = FakeDropbox::Glue.new
 You can provide an optional argument to the constructor, pointing to the
 directory you want to use for your fake Dropbox:
 
-    fake_dropbox = FakeDropbox::Glue.new('/home/joe/somedir')
+```ruby
+fake_dropbox = FakeDropbox::Glue.new('/home/joe/somedir')
+```
 
 If you don't provide it, a temporary directory will be created in the system's
 temporary path.
@@ -97,7 +115,7 @@ require 'fake_dropbox'
 fake_dropbox = FakeDropbox::Glue.new
 
 After do
-fake_dropbox.empty!
+  fake_dropbox.empty!
 end
 ```
 
