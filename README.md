@@ -16,8 +16,15 @@ be only partially implemented):
 * /files_put
 * /files (POST)
 * /metadata
+* /media
 * /fileops/create_folder
 * /fileops/delete
+
+`/media` returns working fake download URLs, though they don't actually expire.
+Also, fake_dropbox emulates a Dropbox account with [Public folder access][]
+enabled, so requesting `http://dl.dropbox.com/u/<uid>/path/file.ext` will
+download `/Public/path/file.ext` without requiring authentication.
+(any string works as a UID, since `/account/info` is not implemented yet)
 
 All the calls which are also present in [Dropbox API version 0][] should behave
 as they behave in the official Dropbox API when version is set to 0 (e.g.
@@ -28,6 +35,7 @@ If you find it useful and want to add support for more features, go ahead ;)
 
 [Dropbox API version 0]: https://www.dropbox.com/developers/reference/oldapi
 [Dropbox API version 1]: https://www.dropbox.com/developers/reference/api
+[Public folder access]: https://www.dropbox.com/help/16/en
 
 
 Installation

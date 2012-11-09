@@ -134,6 +134,13 @@ describe 'FakeDropbox::Server' do
       end
     end
     
+    shared_examples_for "failed PUT upload" do
+      it "returns error 400" do
+        put "/1/files_put/dropbox" + path, body
+        last_response.status.should == 400
+      end
+    end
+
     context "when the path is root" do
       let (:path) { '/dummy.txt' }
       let (:dir) { @tmpdir }
@@ -141,21 +148,33 @@ describe 'FakeDropbox::Server' do
       it_behaves_like "correct PUT upload"
     end
     
-    context "when the path is not root" do
-      context "when the path exists" do
-        let (:path) { '/somedir/dummy.txt' }
-        let (:dir) { File.join(@tmpdir, '/somedir') }
-        before { Dir.mkdir(dir) }
+    context "when the path is not root and already exists" do
+      let (:path) { '/somedir/dummy.txt' }
+      let (:dir) { File.join(@tmpdir, 'somedir') }
+      before { Dir.mkdir(dir) }
         
-        it_behaves_like "correct PUT upload"
-      end
+      it_behaves_like "correct PUT upload"
+    end
       
-      context "when the path does not exist" do
-        it "returns error 404" do
-          put "/1/files_put/dropbox/incorrect/dummy.txt", body
-          last_response.status.should == 404
-        end
-      end
+    context "when the path is not root and does not exist" do
+      let (:path) { '/somedir/dummy.txt' }
+      let (:dir) { File.join(@tmpdir, 'somedir') }
+
+      it_behaves_like "correct PUT upload"
+    end
+
+    context "when the target filename already exists and is a directory" do
+      let (:path) { '/dummy' }
+      before { Dir.mkdir(File.join(@tmpdir, 'dummy')) }
+
+      it_behaves_like "failed PUT upload"
+    end
+
+    context "when the target directory name already exists and is a file" do
+      let (:path) { '/something/dummy.txt' }
+      before { File.open(File.join(@tmpdir, 'something'), 'w') }
+
+      it_behaves_like "failed PUT upload"
     end
   end
   
@@ -196,12 +215,55 @@ describe 'FakeDropbox::Server' do
       it "returns its children metadata too" do
         FileUtils.cp(fixture_path('dummy.txt'), @tmpdir)
         get "/0/metadata/dropbox"
+        last_response.should be_ok
         metadata = JSON.parse(last_response.body)
         metadata.should include 'contents'
       end
     end
   end
   
+  describe "GET /1/media/dropbox/<path>" do
+    it "returns a temporary file URL" do
+      File.open(File.join(@tmpdir, 'file.ext'), 'w')
+      get "/1/media/dropbox/file.ext"
+      media_data = JSON.parse(last_response.body)
+      media_data['url'].should ==
+        'https://dl.dropbox.com/0/view/fake_media_path/file.ext'
+      media_data.should include 'expires'
+    end
+  end
+
+  describe "GET /0/view/fake_media_path/<path>" do
+    before do
+      File.open(File.join(@tmpdir, 'file.ext'), 'w') do |f|
+        f.write "This is a test."
+      end
+    end
+
+    it "returns file contents without authorizing" do
+      post "/__config__", { authorized: false }
+      get "/0/view/fake_media_path/file.ext"
+      last_response.should be_ok
+      last_response.body.should == "This is a test."
+    end
+  end
+
+  describe "GET /u/<uid>/<path>" do
+    before do
+      Dir.mkdir(File.join(@tmpdir, 'Public'))
+      File.open(File.join(@tmpdir, 'Public', 'file.ext'), 'w') do |f|
+        f.write "This is a test."
+      end
+    end
+
+    it "returns files from the Public directory without authorizing" do
+      post "/__config__", { authorized: false }
+      get "/u/8675309/file.ext"
+      last_response.should be_ok
+      last_response.body.should == "This is a test."
+    end
+  end
+
   describe "POST /<version>/fileops/create_folder" do
     shared_examples_for "creating folder" do
       let(:params) { { path: path, root: 'dropbox' } }
