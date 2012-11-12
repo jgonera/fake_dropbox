@@ -1,29 +1,28 @@
+require 'time'
+
 module FakeDropbox
   module Utils
-    DATE_FORMAT = '%a, %d %b %Y %H:%M:%S %z'
-    
-    def metadata(path, list=false)
-      full_path = File.join(@dropbox_dir, path)
-      path.insert(0, '/') if path[0] != '/'
-      bytes = File.directory?(path) ? 0 : File.size(full_path)
+    def metadata(dropbox_path, list = false)
+      path = File.join(@dropbox_dir, dropbox_path)
+      bytes = File.directory?(path) ? 0 : File.size(path)
       
       metadata = {
         thumb_exists: false,
         bytes: bytes,
-        modified: File.mtime(full_path).strftime(DATE_FORMAT),
-        path: path,
-        is_dir: File.directory?(full_path),
+        modified: File.mtime(path).rfc822,
+        path: File.join('/', dropbox_path),
+        is_dir: File.directory?(path),
         size: "#{bytes} bytes",
         root: "dropbox"
       }
       
-      if File.directory?(full_path)
+      if File.directory?(path)
         metadata[:icon] = "folder"
         
         if list
-          entries = Dir.entries(full_path).reject { |x| ['.', '..'].include? x }
+          entries = Dir.entries(path).reject { |x| ['.', '..'].include? x }
           metadata[:contents] = entries.map do |entry|
-            metadata(File.join(path, entry))
+            metadata(File.join(dropbox_path, entry))
           end
         end
       else
