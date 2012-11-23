@@ -1,14 +1,20 @@
 require 'sinatra/base'
 require 'json'
+require 'time'
 require 'fileutils'
 require 'fake_dropbox/utils'
 require 'fake_dropbox/config'
 
 module FakeDropbox
   class Server < Sinatra::Base
+    set :show_exceptions, false
+
+    TIME_FOUR_HOURS = 4 * 60 * 60
+    NO_AUTH_PATHS = ['/__', '/u/', '/0/view/']
+
     before do
-      if not request.path.start_with?('/__') # __sinatra__ and __config__
-        halt 401 unless FakeDropbox::Config.authorized
+      if FakeDropbox::Config.authorized or
+          NO_AUTH_PATHS.any?{ |path| request.path.start_with?(path) }
         @dropbox_dir = ENV['DROPBOX_DIR']
         raise 'no DROPBOX_DIR in ENV' if not @dropbox_dir
         if FakeDropbox::Config.debug
@@ -19,6 +25,8 @@ module FakeDropbox
           puts request.body.read
           request.body.rewind
         end
+      else
+        halt 401
       end
     end
     
@@ -77,24 +85,55 @@ module FakeDropbox
     end
 
     put '/:version/files_put/:mode*' do
-      file_path = File.join(params[:splat])
-      dir = File.join(@dropbox_dir, File.dirname(file_path))
-      return status 404 unless File.exists?(dir) and File.directory?(dir)
+      dropbox_path = params[:splat][0]
+      file_path = File.join(@dropbox_dir, dropbox_path)
+      dir = File.dirname(file_path)
 
-      File.open(File.join(@dropbox_dir, file_path), 'w+') do |file|
+      return status 400 if File.directory?(file_path)
+      return status 400 if File.exists?(dir) and not File.directory?(dir)
+
+      FileUtils.makedirs(dir)
+      File.open(file_path, 'w+') do |file|
         file.write(request.body.read)
       end
 
       content_type :json
-      metadata(file_path).to_json
+      metadata(dropbox_path).to_json
     end
     
     get '/:version/metadata/:mode*' do
-      list = params['list'] == 'false' ? false : true
+      file_path = File.join(@dropbox_dir, params[:splat][0])
+      return status 404 unless File.exists?(file_path)
+
+      list = (params[:list] != 'false')
       content_type :json
       metadata(params[:splat][0], list).to_json
     end
     
+    get '/u/:uid/*' do
+      file_path = File.join(@dropbox_dir, 'Public', params[:splat])
+      return status 404 unless File.exists?(file_path)
+
+      IO.read(file_path)
+    end
+
+    get '/0/view/fake_media_path/*' do
+      file_path = File.join(@dropbox_dir, params[:splat])
+      return status 404 unless File.exists?(file_path)
+
+      IO.read(file_path)
+    end
+
+    get '/1/media/:mode*' do
+      file_path = File.join(@dropbox_dir, params[:splat])
+      return status 404 unless File.exists?(file_path)
+
+      {
+        url: "https://dl.dropbox.com/0/view/fake_media_path#{params[:splat][0]}",
+        expires: (Time.now + TIME_FOUR_HOURS).rfc822
+      }.to_json
+    end
+
     post '/:version/fileops/create_folder' do
       dir = params[:path]
       dir_path = File.join(@dropbox_dir, dir)

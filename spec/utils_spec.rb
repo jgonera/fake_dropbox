@@ -26,7 +26,7 @@ describe 'FakeDropbox::Utils' do
         metadata[:is_dir].should == false
         metadata[:bytes].should == File.size(file_path)
         metadata[:path].should == '/dummy.txt'
-        metadata[:modified].should == File.mtime(file_path).strftime(FakeDropbox::Utils::DATE_FORMAT)
+        metadata[:modified].should == File.mtime(file_path).rfc822
       end
     end
     
@@ -36,7 +36,7 @@ describe 'FakeDropbox::Utils' do
         metadata[:is_dir].should == true
         metadata[:bytes].should == 0
         metadata[:path].should == '/'
-        metadata[:modified].should == File.mtime(fixture_path).strftime(FakeDropbox::Utils::DATE_FORMAT)
+        metadata[:modified].should == File.mtime(fixture_path).rfc822
       end
       
       context "when list is true" do
