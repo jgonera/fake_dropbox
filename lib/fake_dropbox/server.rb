@@ -9,7 +9,7 @@ module FakeDropbox
   class Server < Sinatra::Base
     set :show_exceptions, false
 
-    TIME_FOUR_HOURS = 4 * 60 * 60
+    MEDIA_EXPIRATION = 4 * 60 * 60 # in seconds
     NO_AUTH_PATHS = ['/__', '/u/', '/0/view/']
 
     before do
@@ -130,7 +130,7 @@ module FakeDropbox
 
       {
         url: "https://dl.dropbox.com/0/view/fake_media_path#{params[:splat][0]}",
-        expires: (Time.now + TIME_FOUR_HOURS).rfc822
+        expires: (Time.now + MEDIA_EXPIRATION).rfc822
       }.to_json
     end
 
