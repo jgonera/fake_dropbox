@@ -33,8 +33,9 @@ module FakeDropbox
           "page_white"
         end
         metadata[:rev] = begin
-          @revs ||= {}
-          @revs[full_path] ||= rand(1000000).to_s
+          # todo: don't use class vars -- we need it because Sinatra loses instance data between requests
+          @@revs ||= {}
+          @@revs[full_path] ||= rand(1000000).to_s
         end
       end
 
