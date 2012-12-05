@@ -72,11 +72,23 @@ describe 'FakeDropbox::Entry' do
       end
 
       context "when list is true" do
+        before :each do
+          @tmpdir = Dir.mktmpdir 'fake_dropbox-test'
+        end
+
+        after :each do
+          FileUtils.remove_entry_secure @tmpdir
+        end
+
         it "returns the metadata of all its children too" do
-          metadata = build_entry('/').metadata(true)
+          Dir.mkdir(File.join(@tmpdir, 'stuff'))
+          FileUtils.cp(fixture_path('dummy.txt'), File.join(@tmpdir, 'stuff'))
+          FileUtils.cp(fixture_path('dropbox.png'), File.join(@tmpdir, 'stuff'))
+
+          metadata = FakeDropbox::Entry.new(@tmpdir, '/stuff').metadata(true)
           metadata.should include :contents
-          metadata[:contents].should include(build_entry('dummy.txt').metadata)
-          metadata[:contents].should include(build_entry('dropbox.png').metadata)
+          metadata[:contents].should include(FakeDropbox::Entry.new(@tmpdir, '/stuff/dummy.txt').metadata)
+          metadata[:contents].should include(FakeDropbox::Entry.new(@tmpdir, '/stuff/dropbox.png').metadata)
         end
       end
     end

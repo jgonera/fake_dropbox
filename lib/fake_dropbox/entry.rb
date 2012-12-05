@@ -32,7 +32,7 @@ module FakeDropbox
       if directory? and list_contents
         children = Dir.entries(full_path).reject { |x| ['.', '..'].include? x }
         hash[:contents] = children.map do |child_path|
-          Entry.new(dropbox_root, child_path).metadata
+          Entry.new(dropbox_root, File.join(dropbox_path, child_path)).metadata
         end
       end
       hash
@@ -52,6 +52,8 @@ module FakeDropbox
     end
 
     def build_metadata
+      raise Errno::ENOENT, full_path unless File.exists?(full_path)
+
       bytes = directory? ? 0 : File.size(full_path)
 
       metadata = {
