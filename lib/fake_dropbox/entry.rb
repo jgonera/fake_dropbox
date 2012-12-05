@@ -5,6 +5,7 @@ module FakeDropbox
   # todo:
   # * extract dropbox_root into a proper "Dropbox Filesystem" object
   # * don't use class vars
+  # * handle deletions
   #
   class Entry
     # directory on disk containing our fake dropbox
@@ -18,8 +19,16 @@ module FakeDropbox
       @dropbox_path = dropbox_path
     end
 
+    def full_path
+      File.join(dropbox_root, dropbox_path)
+    end
+
+    def directory?
+      File.directory?(full_path)
+    end
+
     def metadata(list_contents = false)
-      hash = (get_metadata || build_metadata).dup
+      hash = get_metadata.dup
       if directory? and list_contents
         children = Dir.entries(full_path).reject { |x| ['.', '..'].include? x }
         hash[:contents] = children.map do |child_path|
@@ -30,7 +39,16 @@ module FakeDropbox
     end
 
     def get_metadata
-      nil
+      metadatas[full_path] ||= build_metadata
+    end
+
+    def update_metadata
+      metadatas[full_path] = build_metadata
+    end
+
+    def metadatas
+      # todo: don't use class vars -- we need it because Sinatra loses instance data between requests
+      @@metadatas ||= {}
     end
 
     def build_metadata
@@ -56,22 +74,10 @@ module FakeDropbox
         else
           "page_white"
         end
-        metadata[:rev] = begin
-          # todo: don't use class vars -- we need it because Sinatra loses instance data between requests
-          @@revs ||= {}
-          @@revs[full_path] ||= rand(1000000).to_s
-        end
+        metadata[:rev] = rand(100000000).to_s(16)
       end
 
       metadata
-    end
-
-    def full_path
-      File.join(dropbox_root, dropbox_path)
-    end
-
-    def directory?
-      File.directory?(full_path)
     end
   end
 end

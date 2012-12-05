@@ -4,6 +4,7 @@ require 'rack/test'
 require 'fake_dropbox'
 require 'tmpdir'
 require 'fileutils'
+require 'wrong'
 
 module TestHelpers
   def fixture_path(filename='')

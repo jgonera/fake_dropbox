@@ -3,7 +3,11 @@ require 'time'
 module FakeDropbox
   module Utils
     def metadata(dropbox_path, list_contents = false)
-      Entry.new(@dropbox_dir, dropbox_path).metadata(list_contents)
+      FakeDropbox::Entry.new(@dropbox_dir, dropbox_path).metadata(list_contents)
+    end
+
+    def update_metadata(dropbox_path)
+      FakeDropbox::Entry.new(@dropbox_dir, dropbox_path).update_metadata
     end
 
     def safe_path(path)
